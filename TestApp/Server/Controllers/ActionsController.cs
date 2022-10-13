@@ -16,10 +16,10 @@ namespace TestApp.Server.Controllers
         {
             _context = context;
         }
-
+        
         //Obtener el nombre completo de todas las personas insertadas
         [HttpGet("GetFullName")]
-        public async Task<IEnumerable<string>> GetFullName()
+        public async Task<List<string>> GetFullName()
         {
             return await _context.Persons.Select(x => $"{x.FirstName} {x.LastName} {x.SecondLastName} {x.MiddleName}").ToListAsync();
         }

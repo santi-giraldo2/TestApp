@@ -68,8 +68,8 @@ a, .btn-link {
     display: flex;
     justify-content: center;
 }
-    
-.icon-edit {
+
+.icon-action {
     font-size: 20px;
     cursor: pointer;
     padding-top: 4px;

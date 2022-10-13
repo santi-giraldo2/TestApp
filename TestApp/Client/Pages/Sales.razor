@@ -1,4 +1,4 @@
-﻿@page "/sales"
+﻿@page "/sales/{IdPerson}"
 @inject HttpClient Http
 
 <PageTitle>Ventas</PageTitle>
@@ -33,12 +33,12 @@ else
                         <BSTD>@sale.Total</BSTD>
                         <BSTD>
                             <div class="container-icon">
-                                <i @onclick=@(() => handleButtonEdit(sale.Id))  class="fa fa-edit icon-edit"></i>
+                                <i @onclick=@(() => handleButtonEdit(sale.Id))  class="fa fa-edit icon-action"></i>
                             </div>
                         </BSTD>
                          <BSTD>
                             <div class="container-icon">
-                                <i @onclick=@(() => handleButtonDelete(sale.Id))  class="fa fa-trash icon-edit"></i>
+                                <i @onclick=@(() => handleButtonDelete(sale.Id))  class="fa fa-trash icon-action"></i>
                             </div>
                         </BSTD>
                     </BSTR>
@@ -49,29 +49,25 @@ else
     }
     else
     {
-        <PersonForm Id="@PersonId" ChangeView="@changeView" />
+        <SaleForm Id="@SaleId" PersonId="@Convert.ToInt32(IdPerson)" ChangeView="@changeView" />
     }
 
 }
 
 @code {
     [Parameter]
-    [SupplyParameterFromQuery]
-    public int IdPerson { get; set; }
+    public string IdPerson { get; set; }
 
     public List<SaleDTO> Data = new List<SaleDTO>();
-
     public bool ShowData = true;
-    
     public int SaleId = 0;
-    
     public int PersonId = 0;
 
     private async Task GetData()
     {
-        Data = await Http.GetFromJsonAsync<List<SaleDTO>>($"Sale/GetSalesByPerson/{IdPerson}");
+        Data = await Http.GetFromJsonAsync<List<SaleDTO>>($"Sale/GetByPerson/{IdPerson}");
     }
-    
+
     protected override async Task OnInitializedAsync()
     {
         await GetData();

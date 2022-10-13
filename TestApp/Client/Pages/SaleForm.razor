@@ -1,0 +1,93 @@
+﻿@inject HttpClient Http
+
+@if(Sale == null){
+    <p>Cargando...</p>
+}
+else
+{
+    <BSForm Model="Sale" IsRow="true" Gutters="Gutters.Medium" OnSubmit="OnSubmit" OnReset="ChangeView">
+         <DataAnnotationsValidator />
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            @_message
+            <BSValidationSummary />
+        </BSCol>
+         <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Nombre</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="Sale.Name" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Sale.Name)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Descripción</BSLabel>
+            <BSInput InputType="InputType.TextArea" @bind-Value="Sale.Description" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Sale.Description)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Total</BSLabel>
+            <BSInput InputType="InputType.Number" @bind-Value="Sale.Total" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Sale.Total)" />
+        </BSCol>
+        
+        <BSCol Column="12">
+            <BSButton Color="BSColor.Primary" IsSubmit="true">Guardar</BSButton>
+            <BSButton Color="BSColor.Secondary" IsReset="true" @onclick="ChangeView">Cancelar</BSButton>
+        </BSCol>
+    </BSForm>
+}
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public int PersonId { get; set; }
+
+    [Parameter]
+    public EventCallback ChangeView { get; set; }
+
+    private string _message = "";
+
+    private SaleDTO Sale { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            Sale = await Http.GetFromJsonAsync<SaleDTO>($"Sale/{Id}");
+        }
+        else
+        {
+            Sale = new SaleDTO() { PersonId = PersonId };
+        }
+    }
+
+    private async Task OnSubmit(EditContext e)
+    {
+        if (e.Validate())
+        {
+            var response = Id == 0 ? await Http.PostAsJsonAsync("Sale", Sale) : await Http.PutAsJsonAsync($"Sale/{Sale.Id}", Sale);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                _message = "Registro guardado correctamente";
+                await ChangeView.InvokeAsync();
+            }
+            else
+            {
+                _message = "Error al guardar el registro";
+            }
+    
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id != null)
+        {
+            await Http.PutAsJsonAsync($"Sale/{Id}", Sale);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("Sale", Sale);
+        }
+    }
+
+    
+}

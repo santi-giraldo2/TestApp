@@ -18,9 +18,10 @@ namespace TestApp.Server.Controllers
             _context = context;
         }
 
-        [HttpGet("GetByPerson/{IdPerson:int}")]
-        public async Task<IEnumerable<SaleDTO>> GetByPerson(int IdPerson)
+        [HttpGet("GetByPerson/{IdPerson}")]
+        public async Task<List<SaleDTO>> GetByPerson(int IdPerson)
         {
+        Console.WriteLine(IdPerson);
             return await _context.Sales.Where(x => x.PersonId == IdPerson).Select(x =>
             new SaleDTO
             {
@@ -64,10 +65,15 @@ namespace TestApp.Server.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        public async Task<ActionResult> Put(SaleDTO sale)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(int id, SaleDTO sale)
         {
-            var model = await _context.Sales.FirstOrDefaultAsync(x => x.Id == sale.Id);
+            if (id != sale.Id)
+            {
+                return BadRequest();
+            }
+            
+            var model = await _context.Sales.FindAsync(id);
             if (model == null)
             {
                 return BadRequest();

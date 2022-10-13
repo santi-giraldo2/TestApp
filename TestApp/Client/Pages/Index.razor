@@ -44,17 +44,17 @@ else
                         <BSTD>@(person.Gender == "M" ? "Hombre":"Mujer")</BSTD>
                         <BSTD>
                             <div class="container-icon">
-                                <i @onclick=@(() => handleButtonEdit(person.Id))  class="fa fa-edit icon-edit"></i>
+                                <i @onclick=@(() => handleButtonEdit(person.Id))  class="icon-action fa fa-edit "></i>
                             </div>
                         </BSTD>
                          <BSTD>
                             <div class="container-icon">
-                                <i @onclick=@(() => handleButtonDelete(person.Id))  class="fa fa-trash icon-edit"></i>
+                                <i @onclick=@(() => handleButtonDelete(person.Id))  class="fa fa-trash icon-action"></i>
                             </div>
                         </BSTD>
                           <BSTD>
                             <div class="container-icon">
-                                <i @onclick=@(() => handleButtonNavigation(person.Id))  class="fa-light fa-location-arrow"></i>
+                                <i @onclick=@(() => handleButtonNavigation(person.Id))  class="fa-light fa-location-arrow icon-action"></i>
                             </div>
                         </BSTD>
                     </BSTR>
@@ -113,7 +113,7 @@ else
 
 @code{
     public List<PersonDTO> Data = new List<PersonDTO>();
-    public IEnumerable<string> DataFullName = new IEnumerable<string>();
+    public List<string> DataFullName = new List<string>();
     public bool ShowData = true;
     public int PersonId = 0;
 
@@ -158,7 +158,7 @@ else
 
     private async Task handleFullName()
     {
-        var response = await Http.GetFromJsonAsync<IEnumerable<string>>("Actions/GetFullName");
+        var response = await Http.GetFromJsonAsync<List<string>>("Actions/GetFullName");
 
     }
 
@@ -199,6 +199,6 @@ else
 
     private void handleButtonNavigation(int Id)
     {
-        navigation.NavigateTo($"/Sales/IdPerson={Id}");
+        navigation.NavigateTo($"/sales/{Id}");
     }
 }
