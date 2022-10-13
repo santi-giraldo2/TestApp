@@ -42,7 +42,8 @@ namespace TestApp.Server.Controllers
         [HttpGet("GetOlder")]
         public string GetOlder()
         {
-            return _context.Persons.MaxBy(x => x.Age).FirstName;
+            var response =  _context.Persons.MaxBy(x => x.Age);
+            return $"{response.FirstName} {response.LastName} {response.SecondLastName} {response.MiddleName}";
         }
 
         //obtener el promedio de edad de las personas

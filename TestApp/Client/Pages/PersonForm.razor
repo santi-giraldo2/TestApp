@@ -1,0 +1,128 @@
+﻿@inject HttpClient Http
+
+@if(Person == null){
+    <p>Cargando...</p>
+}
+else
+{
+    <BSForm Model="Person" IsRow="true" Gutters="Gutters.Medium" OnSubmit="OnSubmit" OnReset="ChangeView">
+         <DataAnnotationsValidator />
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            @_message
+            <BSValidationSummary />
+        </BSCol>
+         <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Numero de documento</BSLabel>
+            <BSInput InputType="InputType.Number" @bind-Value="Person.Id" ValidateOnInput="true" IsReadonly="@(Id != 0)" />
+            <BSFeedback For="@(() => Person.Id)" />
+        </BSCol>
+         <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Primer nombre</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="Person.FirstName" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Person.FirstName)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Segundo nombre</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="Person.MiddleName" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Person.MiddleName)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Primer apellido</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="Person.LastName" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Person.LastName)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Segundo apellido</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="Person.SecondLastName" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Person.SecondLastName)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Teléfono</BSLabel>
+            <BSInput InputType="InputType.Number" @bind-Value="Person.Phone" ValidateOnInput="true"  />
+            <BSFeedback For="@(() => Person.Phone)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Correo</BSLabel>
+            <BSInput InputType="InputType.Email" @bind-Value="Person.Email" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Person.Email)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Dirección</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="Person.Address" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Person.Address)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Edad</BSLabel>
+            <BSInput InputType="InputType.Number" @bind-Value="Person.Age" ValidateOnInput="true" />
+            <BSFeedback For="@(() => Person.Age)" />
+        </BSCol>
+        <BSCol Position="Position.Relative" ColumnMedium="6">
+            <BSLabel>Genero</BSLabel>
+            <BSInput InputType="InputType.Select" @bind-Value="Person.Gender" ValidateOnInput="true">
+                <option value=null>Seleccione</option>
+                <option value="M">Hombre</option>
+                <option value="F">Mujer</option>
+            </BSInput>
+            <BSFeedback For="@(() => Person.Gender)" />
+        </BSCol>
+        <BSCol Column="12">
+            <BSButton Color="BSColor.Primary" IsSubmit="true">Guardar</BSButton>
+            <BSButton Color="BSColor.Secondary" IsReset="true" @onclick="ChangeView">Cancelar</BSButton>
+        </BSCol>
+    </BSForm>
+}
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public EventCallback ChangeView { get; set; }
+
+    private string _message = "";
+
+    private PersonDTO Person { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            Person = await Http.GetFromJsonAsync<PersonDTO>($"Person/{Id}");
+        }
+        else
+        {
+            Person = new PersonDTO();
+        }
+    }
+
+    private async Task OnSubmit(EditContext e)
+    {
+        if (e.Validate())
+        {
+            var response = Id == 0 ? await Http.PostAsJsonAsync("Person", Person) : await Http.PutAsJsonAsync($"Person/{Person.Id}", Person);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                _message = "Registro guardado correctamente";
+                await ChangeView.InvokeAsync();
+            }
+            else
+            {
+                _message = "Error al guardar el registro";
+            }
+    
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id != null)
+        {
+            await Http.PutAsJsonAsync($"Person/{Id}", Person);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("Person", Person);
+        }
+    }
+
+    
+}

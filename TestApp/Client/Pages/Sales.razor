@@ -1,0 +1,108 @@
+﻿@page "/sales"
+@inject HttpClient Http
+
+<PageTitle>Ventas</PageTitle>
+
+@if(Data.Count == 0)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    @if(ShowData)
+    {
+        <BSButton @onclick=handleButtonNew style="margin-bottom: 10px" Color="BSColor.Primary">Crear nuevo</BSButton>
+        <BSTable IsResponsive="true" IsStriped="true">
+            <BSTHead>
+                <BSTR>
+                    <BSTD>Id</BSTD>
+                    <BSTD>Nombre</BSTD>
+                    <BSTD>Descripción</BSTD>
+                    <BSTD>Total</BSTD>
+                    <BSTD>Editar</BSTD>
+                    <BSTD>Eliminar</BSTD>
+                </BSTR>
+            </BSTHead>
+            <BSTBody>
+                @foreach (var sale in Data)
+                {
+                    <BSTR>
+                        <BSTD>@sale.Id</BSTD>
+                        <BSTD>@sale.Name</BSTD>
+                        <BSTD>@sale.Description</BSTD>
+                        <BSTD>@sale.Total</BSTD>
+                        <BSTD>
+                            <div class="container-icon">
+                                <i @onclick=@(() => handleButtonEdit(sale.Id))  class="fa fa-edit icon-edit"></i>
+                            </div>
+                        </BSTD>
+                         <BSTD>
+                            <div class="container-icon">
+                                <i @onclick=@(() => handleButtonDelete(sale.Id))  class="fa fa-trash icon-edit"></i>
+                            </div>
+                        </BSTD>
+                    </BSTR>
+                
+                }
+            </BSTBody>
+        </BSTable>
+    }
+    else
+    {
+        <PersonForm Id="@PersonId" ChangeView="@changeView" />
+    }
+
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int IdPerson { get; set; }
+
+    public List<SaleDTO> Data = new List<SaleDTO>();
+
+    public bool ShowData = true;
+    
+    public int SaleId = 0;
+    
+    public int PersonId = 0;
+
+    private async Task GetData()
+    {
+        Data = await Http.GetFromJsonAsync<List<SaleDTO>>($"Sale/GetSalesByPerson/{IdPerson}");
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetData();
+    }
+    
+    private void handleButtonNew()
+    {
+        SaleId = 0;
+        ShowData = false;
+    }
+    
+    private async Task changeView()
+    {
+        ShowData = !ShowData;
+        if (ShowData)
+        {
+            await GetData();
+        }
+    }
+    
+    private void handleButtonEdit(int Id)
+    {
+        SaleId = Id;
+        changeView();
+    }
+    
+    private async Task handleButtonDelete(int Id)
+    {
+        var response = await Http.DeleteAsync($"Sale/{Id}");
+        await GetData();
+    }
+   
+    
+}
