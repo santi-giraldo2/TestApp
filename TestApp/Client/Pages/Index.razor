@@ -5,10 +5,10 @@
 
 <PageTitle>Index</PageTitle>
 
-  <BSToaster/>
 
 <h1>Personas</h1>
 
+  <BSToaster/>
 @if(Data.Count == 0)
 {
     <p>Cargando...</p>
@@ -17,54 +17,6 @@ else
 {
     @if(ShowData)
     {
-        <BSButton @onclick=handleButtonNew style="margin-bottom: 10px" Color="BSColor.Primary">Crear nuevo</BSButton>
-        <BSTable IsResponsive="true" IsStriped="true">
-            <BSTHead>
-                <BSTR>
-                    <BSTD>Numero documento</BSTD>
-                    <BSTD>Nombre completo</BSTD>
-                    <BSTD>Teléfono</BSTD>
-                    <BSTD>Correo</BSTD>
-                    <BSTD>Dirección</BSTD>
-                    <BSTD>Edad</BSTD>
-                    <BSTD>Género</BSTD>
-                    <BSTD>Editar</BSTD>
-                    <BSTD>Eliminar</BSTD>
-                    <BSTD>Ventas</BSTD>
-                </BSTR>
-            </BSTHead>
-            <BSTBody>
-                @foreach (var person in Data)
-                {
-                    <BSTR>
-                        <BSTD>@person.Id</BSTD>
-                        <BSTD>@($"{person.FirstName} {person.MiddleName} {person.LastName} {person.SecondLastName}")</BSTD>
-                        <BSTD>@person.Phone</BSTD>
-                        <BSTD>@person.Email</BSTD>
-                        <BSTD>@person.Address</BSTD>
-                        <BSTD>@person.Age</BSTD>
-                        <BSTD>@(person.Gender == "M" ? "Hombre":"Mujer")</BSTD>
-                        <BSTD>
-                            <div class="container-icon">
-                                <i @onclick=@(() => handleButtonEdit(person.Id))  class="icon-action fa fa-edit "></i>
-                            </div>
-                        </BSTD>
-                         <BSTD>
-                            <div class="container-icon">
-                                <i @onclick=@(() => handleButtonDelete(person.Id))  class="fa fa-trash icon-action"></i>
-                            </div>
-                        </BSTD>
-                          <BSTD>
-                            <div class="container-icon">
-                                <i @onclick=@(() => handleButtonNavigation(person.Id))  class="fa-light fa-location-arrow icon-action"></i>
-                            </div>
-                        </BSTD>
-                    </BSTR>
-                
-                }
-            </BSTBody>
-        </BSTable>
-
         @if(Data.Count>=10)
         {
             <BSRow>
@@ -104,6 +56,56 @@ else
                 </BSTable>
             }
         }
+        
+        <div style="margin-top: 20px">
+            <BSButton @onclick=handleButtonNew style="margin-bottom: 10px" Color="BSColor.Primary">Crear nuevo</BSButton>
+            <BSTable IsResponsive="true" IsStriped="true">
+                <BSTHead>
+                    <BSTR>
+                        <BSTD>Numero documento</BSTD>
+                        <BSTD>Nombre completo</BSTD>
+                        <BSTD>Teléfono</BSTD>
+                        <BSTD>Correo</BSTD>
+                        <BSTD>Dirección</BSTD>
+                        <BSTD>Edad</BSTD>
+                        <BSTD>Género</BSTD>
+                        <BSTD>Editar</BSTD>
+                        <BSTD>Eliminar</BSTD>
+                        <BSTD>Ventas</BSTD>
+                    </BSTR>
+                </BSTHead>
+                <BSTBody>
+                    @foreach (var person in Data)
+                    {
+                        <BSTR>
+                            <BSTD>@person.Id</BSTD>
+                            <BSTD>@($"{person.FirstName} {person.MiddleName} {person.LastName} {person.SecondLastName}")</BSTD>
+                            <BSTD>@person.Phone</BSTD>
+                            <BSTD>@person.Email</BSTD>
+                            <BSTD>@person.Address</BSTD>
+                            <BSTD>@person.Age</BSTD>
+                            <BSTD>@(person.Gender == "M" ? "Hombre":"Mujer")</BSTD>
+                            <BSTD>
+                                <div class="container-icon">
+                                    <i @onclick=@(() => handleButtonEdit(person.Id))  class="icon-action fa fa-edit "></i>
+                                </div>
+                            </BSTD>
+                             <BSTD>
+                                <div class="container-icon">
+                                    <i @onclick=@(() => handleButtonDelete(person.Id))  class="icon-action fa fa-trash"></i>
+                                </div>
+                            </BSTD>
+                              <BSTD>
+                                <div class="container-icon">
+                                    <i @onclick=@(() => handleButtonNavigation(person.Id))  class="icon-action fa fa-mail-forward"></i>
+                                </div>
+                            </BSTD>
+                        </BSTR>
+                
+                    }
+                </BSTBody>
+            </BSTable>
+        </div>
     }
     else
     {
@@ -160,13 +162,20 @@ else
 
     private async Task handleFullName()
     {
-        var response = await Http.GetFromJsonAsync<List<string>>("Actions/GetFullName");
+        if (DataFullName.Count() > 0)
+        {
+            DataFullName.Clear();
+        }
+        else
+        {
+            DataFullName = await Http.GetFromJsonAsync<List<string>>("Actions/GetFullName");
 
+        }
     }
 
     private async Task handleGetWomen()
     {
-        var response = await Http.GetFromJsonAsync<int>("Actions/GetWoman");
+        var response = await Http.GetFromJsonAsync<int>("Actions/GetWomen");
         _blazorStrap.Toaster.Add("Cantidad de mujeres registradas", $"{response}", o =>
         {
             o.CloseAfter = 5000;
@@ -182,17 +191,20 @@ else
             o.CloseAfter = 5000;
         });
     }
+    
     private async Task handleGetOlder()
     {
-        var response = await Http.GetFromJsonAsync<string>("Actions/GetOlder");
-        _blazorStrap.Toaster.Add("Nombre completo de la persona con mayor edad", response, o =>
+        var response = await Http.GetFromJsonAsync<string>("Actions/GetOldestPerson");
+        
+        _blazorStrap.Toaster.Add("Nombre completo de la persona con mayor edad", $"{response}", o =>
         {
             o.CloseAfter = 5000;
         });
     }
+    
     private async Task handleAverage()
     {
-        var response = await Http.GetFromJsonAsync<double>("Actions/GetOlder");
+        var response = await Http.GetFromJsonAsync<double>("Actions/GetAverageAge");
         _blazorStrap.Toaster.Add("Promedio por edad", $"{response}", o =>
         {
             o.CloseAfter = 5000;

@@ -35,15 +35,7 @@ namespace TestApp.Server.Controllers
         [HttpGet("GetMen")]
         public async Task<int> GetMen()
         {
-            return await _context.Persons.Where(x => x.Gender == "F").CountAsync();
-        }
-
-        //obtener el nombre completo de la persona con mayor edad
-        [HttpGet("GetOlder")]
-        public string GetOlder()
-        {
-            var response =  _context.Persons.MaxBy(x => x.Age);
-            return $"{response.FirstName} {response.LastName} {response.SecondLastName} {response.MiddleName}";
+            return await _context.Persons.Where(x => x.Gender == "M").CountAsync();
         }
 
         //obtener el promedio de edad de las personas
@@ -51,6 +43,13 @@ namespace TestApp.Server.Controllers
         public async Task<double> GetAverageAge()
         {
             return await _context.Persons.AverageAsync(x => x.Age);
+        }
+
+        //Obtener el nombre completo de la persona com mayor edad
+        [HttpGet("GetOldestPerson")]
+        public async Task<string?> GetOldestPerson()
+        {
+            return await _context.Persons.OrderByDescending(x => x.Age).Select(x => $"{x.FirstName} {x.LastName} {x.SecondLastName} {x.MiddleName}").FirstOrDefaultAsync();
         }
     }
 }

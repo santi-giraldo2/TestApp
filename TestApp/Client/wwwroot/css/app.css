@@ -70,7 +70,7 @@ a, .btn-link {
 }
 
 .icon-action {
-    font-size: 20px;
+    font-size: 125% !important;
     cursor: pointer;
     padding-top: 4px;
 }
